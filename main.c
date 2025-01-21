@@ -7,9 +7,19 @@
 #include <time.h>
 #include "resource.h"
 
-void setColor(int color) {
+void setColor(int color)
+{
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hConsole, color);
+}
+
+void clearScreen()
+{
+#ifdef _WIN32
+    system("cls"); // Comando para Windows
+#else
+    system("clear"); // Comando para Linux/Mac
+#endif
 }
 
 #define COLOR_WHITE 7
@@ -28,29 +38,44 @@ const char *hint = "\033[0;33m";
 const char *reset = "\033[0m";
 
 void verifyAction(char *action, int *user_cards, int *user_card_count, int *bot_cards, int *bot_card_count);
+void restartGame();
 
-const char *getCardNumber(int i) {
-    switch (i) {
-    case 0: return "I";
-    case 1: return "II";
-    case 2: return "III";
-    case 3: return "IV";
-    case 4: return "V";
-    case 5: return "VI";
-    case 6: return "VII";
-    case 7: return "VIII";
-    case 8: return "IX";
-    case 9: return "X";
-    default: return "-/-";
+const char *getCardNumber(int i)
+{
+    switch (i)
+    {
+    case 0:
+        return "I";
+    case 1:
+        return "II";
+    case 2:
+        return "III";
+    case 3:
+        return "IV";
+    case 4:
+        return "V";
+    case 5:
+        return "VI";
+    case 6:
+        return "VII";
+    case 7:
+        return "VIII";
+    case 8:
+        return "IX";
+    case 9:
+        return "X";
+    default:
+        return "-/-";
     }
 }
 
-void addCard(char *action, int *user_cards, int *user_card_count, int *bot_cards, int *bot_card_count) {
+void addCard(char *action, int *user_cards, int *user_card_count, int *bot_cards, int *bot_card_count)
+{
     int new_card = (rand() % 10) + 1;        // Gera uma nova carta aleatória (1 a 10)
     user_cards[*user_card_count] = new_card; // Adiciona ao array
     (*user_card_count)++;                    // Incrementa o contador de cartas do usuário
 
-    char *suit[4] = {"S", "C", "H", "D"}; // Naipes
+    char *suit[4] = {"de Espadas", "de Copas", "de Ouros", "de Paus"}; // Naipes
     int suit_size = sizeof(suit) / sizeof(suit[0]);
 
     // Inicializando gerador de números aleatórios
@@ -60,22 +85,30 @@ void addCard(char *action, int *user_cards, int *user_card_count, int *bot_cards
 
     setColor(COLOR_CYAN);
     printf("Suas cartas:\n");
-    setColor(COLOR_WHITE);
-    for (int i = 0; i < *user_card_count; i++) {
+    for (int i = 0; i < *user_card_count; i++)
+    {
         user_total += user_cards[i];
-        printf("%d. %d %s\n", i + 1, user_cards[i], suit[rand() % suit_size]);
+        printf("%s. %d %s\n", getCardNumber(i), user_cards[i], suit[rand() % suit_size]);
     }
     printf("Total: %d\n\n", user_total);
+    setColor(COLOR_WHITE);
 
-    if (user_total > 21) {
+    if (user_total > 21)
+    {
         setColor(COLOR_RED);
         printf("Sua pontuação excede 21 pontos. Você perdeu.\n\n");
         setColor(COLOR_WHITE);
-    } else if (user_total == 21) {
+        restartGame();
+    }
+    else if (user_total == 21)
+    {
         setColor(COLOR_GREEN);
         printf("--> Parabéns! Você atingiu exatamente 21 pontos e ganhou.\n\n");
         setColor(COLOR_WHITE);
-    } else {
+        restartGame();
+    }
+    else
+    {
         // Pedir ao jogador se deseja continuar jogando
         setColor(COLOR_YELLOW);
         printf("Deseja continuar sua jogada? (h - para hit/s - para stand) ");
@@ -85,8 +118,10 @@ void addCard(char *action, int *user_cards, int *user_card_count, int *bot_cards
     }
 }
 
-void verifyAction(char *action, int *user_cards, int *user_card_count, int *bot_cards, int *bot_card_count) {
-    switch (*action) {
+void verifyAction(char *action, int *user_cards, int *user_card_count, int *bot_cards, int *bot_card_count)
+{
+    switch (*action)
+    {
     case 'h':
     case 'H':
         setColor(COLOR_MAGENTA);
@@ -101,7 +136,7 @@ void verifyAction(char *action, int *user_cards, int *user_card_count, int *bot_
         setColor(COLOR_WHITE);
 
         // Simulação do bot jogando
-        char *suit[4] = {"♠", "♣", "♥", "♦"}; // Naipes
+        char *suit[4] = {"de Espadas", "de Copas", "de Ouros", "de Paus"}; // Naipes
         int suit_size = sizeof(suit) / sizeof(suit[0]);
 
         int bot_total = 0;
@@ -109,18 +144,21 @@ void verifyAction(char *action, int *user_cards, int *user_card_count, int *bot_
         setColor(COLOR_GREEN);
         printf("Cartas do bot:\n");
         setColor(COLOR_WHITE);
-        for (int i = 0; i < *bot_card_count; i++) {
+        for (int i = 0; i < *bot_card_count; i++)
+        {
             bot_total += bot_cards[i];
-            printf("%d. %d %s\n", i + 1, bot_cards[i], suit[rand() % suit_size]);
+            printf("%s. %d %s\n", getCardNumber(i), bot_cards[i], suit[rand() % suit_size]);
         }
         printf("Total: %d\n\n", bot_total);
 
         int user_total = 0;
-        for (int i = 0; i < *user_card_count; i++) {
+        for (int i = 0; i < *user_card_count; i++)
+        {
             user_total += user_cards[i];
         }
 
-        while (bot_total < 17) {
+        while (bot_total < 17)
+        {
             setColor(COLOR_MAGENTA);
             printf("--> Bot está comprando uma carta a mais.\n\n");
             setColor(COLOR_WHITE);
@@ -137,38 +175,53 @@ void verifyAction(char *action, int *user_cards, int *user_card_count, int *bot_
             setColor(COLOR_WHITE);
 
             bot_total = 0; // Resetando para não ter problemas ao recalcular
-            for (int i = 0; i < *bot_card_count; i++) {
+            for (int i = 0; i < *bot_card_count; i++)
+            {
                 bot_total += bot_cards[i];
-                printf("%d. %d %s\n", i + 1, bot_cards[i], suit[rand() % suit_size]);
+                printf("%s. %d %s\n", getCardNumber(i), bot_cards[i], suit[rand() % suit_size]);
             }
             printf("Total: %d\n\n", bot_total);
         }
 
-        if (bot_total > 21) {
+        if (bot_total > 21)
+        {
             setColor(COLOR_RED);
             printf("Bot perdeu (%d). ", bot_total);
             setColor(COLOR_GREEN);
             printf("Você ganhou (%d).\n\n", user_total);
             setColor(COLOR_WHITE);
-        } else if (bot_total == 21) {
+            restartGame();
+        }
+        else if (bot_total == 21)
+        {
             setColor(COLOR_YELLOW);
             printf("--> Wow! O bot atingiu exatamente 21 pontos e ganhou.\n\n");
             setColor(COLOR_WHITE);
-        } else if (bot_total < 21 && bot_total < user_total) {
+            restartGame();
+        }
+        else if (bot_total < 21 && bot_total < user_total)
+        {
             setColor(COLOR_GREEN);
             printf("--> Parabéns! Você ganhou (%d). ", user_total);
             setColor(COLOR_RED);
             printf("O bot perdeu (%d).\n\n", bot_total);
             setColor(COLOR_WHITE);
-        } else if (bot_total < 21 && bot_total > user_total) {
+            restartGame();
+        }
+        else if (bot_total < 21 && bot_total > user_total)
+        {
             setColor(COLOR_RED);
             printf("--> Wow! O bot ganhou (%d). ", bot_total);
             printf("Você perdeu (%d).\n\n", user_total);
             setColor(COLOR_WHITE);
-        } else if (bot_total < 21 && bot_total == user_total) {
+            restartGame();
+        }
+        else if (bot_total < 21 && bot_total == user_total)
+        {
             setColor(COLOR_YELLOW);
             printf("--> Empate! Você e o bot tiveram exatamente %d pontos.\n\n", bot_total);
             setColor(COLOR_WHITE);
+            restartGame();
         }
         break;
     default:
@@ -183,10 +236,8 @@ void verifyAction(char *action, int *user_cards, int *user_card_count, int *bot_
     }
 }
 
-void main()
+void game()
 {
-    system("chcp 65001 > nul");
-    setlocale(LC_ALL, "en_US.UTF-8");
     printf(" ▄▄▄▄    ██▓     ▄▄▄       ▄████▄   ██ ▄█▀ ▄▄▄██▀▀▀ ▄▄▄       ▄████▄   ██ ▄█▀\n");
     printf("▓█████▄ ▓██▒    ▒████▄    ▒██▀ ▀█   ██▄█▒    ▒██   ▒████▄    ▒██▀ ▀█   ██▄█▒ \n");
     printf("▒██▒ ▄██▒██░    ▒██  ▀█▄  ▒▓█    ▄ ▓███▄░    ░██   ▒██  ▀█▄  ▒▓█    ▄ ▓███▄░ \n");
@@ -198,11 +249,11 @@ void main()
     printf(" ░          ░  ░      ░  ░░ ░      ░  ░    ░   ░         ░  ░░ ░      ░  ░   \n");
     printf("      ░                   ░                                  ░                \n\n");
 
-    int user_cards[9] = {0};              // Cartas do jogador
-    int bot_cards[9] = {0};               // Cartas do bot
-    int user_card_count = 2;              // Número inicial de cartas do jogador
-    int bot_card_count = 2;               // Número inicial de cartas do bot
-    char *suit[4] = {"S", "C", "H", "D"}; // Naipes
+    int user_cards[9] = {0};                                           // Cartas do jogador
+    int bot_cards[9] = {0};                                            // Cartas do bot
+    int user_card_count = 2;                                           // Número inicial de cartas do jogador
+    int bot_card_count = 2;                                            // Número inicial de cartas do bot
+    char *suit[4] = {"de Espadas", "de Copas", "de Ouros", "de Paus"}; // Naipes
     int suit_size = sizeof(suit) / sizeof(suit[0]);
 
     // Inicializando gerador de números aleatórios
@@ -235,6 +286,40 @@ void main()
     scanf(" %c", &action);
 
     verifyAction(&action, user_cards, &user_card_count, bot_cards, &bot_card_count);
+};
+
+// Função que pergunta se o jogador deseja reiniciar o jogo
+void restartGame()
+{
+    char restart;
+
+    printf("\nDeseja reiniciar o jogo? (s - para sim/n - para não): ");
+    scanf(" %c", &restart);
+    if (restart == 's' || restart == 'S')
+    {
+        printf("\n\nReiniciando o jogo...\n");
+        Sleep(1000);
+        clearScreen();
+        game();
+    }
+    else if (restart == 'n' || 'N')
+    {
+        exit(0);
+    }
+    else
+    {
+        printf("\n\nAção inválida. Por favor, tente novamente.\n");
+        restartGame();
+    }
+};
+
+// Função principal
+void main()
+{
+    system("chcp 65001 > nul");
+    setlocale(LC_ALL, "en_US.UTF-8");
+
+    game();
 
     system("pause");
-}
+};
