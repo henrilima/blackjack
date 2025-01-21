@@ -13,11 +13,11 @@ Este projeto foi desenvolvido com o intuito de estudar e praticar o uso de recur
 ## Estrutura do Projeto
 ```
 /Projeto
-	├── ICO
-	|	└── card.ico      # O arquivo de ícone
-    ├── main.c            # Código-fonte principal
-    ├── resource.rc       # Arquivo de recursos com o ícone
-    ├── resource.h        # Arquivo de cabeçalho
+    ├── /ICO
+    │    └── card.ico        # Arquivo de ícone
+    ├── main.c               # Código-fonte principal
+    ├── resource.rc          # Arquivo de recursos
+    ├── resource.h           # Arquivo de cabeçalho
 ```
 
 ## Licença
